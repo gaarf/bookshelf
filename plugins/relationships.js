@@ -8,7 +8,7 @@ module.exports = function(Bookshelf) {
 
   var Model = Bookshelf.Model.extend({
 
-    relationships: function() {
+    relationships: _.memoize(function() {
       return _(this).methods()
         .filter(function(name){
           return this[name].toString().match(
@@ -17,7 +17,7 @@ module.exports = function(Bookshelf) {
         }, this)  
         .sort()
         .value();
-    }
+    }, function() { return this.cid; })
 
   , loadAll: function() {
       return this.load(this.relationships());

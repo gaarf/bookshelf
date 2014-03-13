@@ -2,12 +2,14 @@ var _         = require('lodash');
 var deepEqual = require('assert').deepEqual;
 
 module.exports = function (bookshelf) {
-  var Author, objs = require('../helpers/objects');
+  var Author, Tag;
 
   describe('relationships plugin', function () {
     before(function() {
       bookshelf.plugin('relationships');
-      Author = objs(bookshelf).Models.Author;
+      var objs = require('../helpers/objects')(bookshelf);
+      Author = objs.Models.Author;
+      Tag = objs.Models.Tag;
     });
 
     var want = ['site', 'photo', 'posts', 'ownPosts', 'blogs']
@@ -17,17 +19,20 @@ module.exports = function (bookshelf) {
       deepEqual( Author.relationships(), want );
     });
 
-    it('works on an instance', function () {
-      deepEqual( Author.forge().relationships(), want );
-    });
-
     it('loadAll gets all relations', function (done) {
       var foo = new Author();
+
+      deepEqual( foo.relationships(), want );
+
       foo.loadAll().then(function() {
         deepEqual( _(foo.relations).keys().sort().value(), want );
         done();
       });
     }); 
+
+    it('works on another instance', function () {
+      deepEqual( Tag.forge().relationships(), ['posts'] );
+    });
 
   });
 };
